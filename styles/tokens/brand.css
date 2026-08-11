@@ -1,0 +1,48 @@
+/* BondScanner — Brand & convenience aliases
+   Maps the raw AlignUI token set (fig-tokens.css) onto friendly, brand-named
+   handles, and resolves the unitless radius/spacing floats into px lengths you
+   can drop straight into CSS. Blue is primary, gray is the neutral workhorse. */
+
+:root {
+  /* ── Brand ────────────────────────────────────────────────── */
+  --brand: var(--blue-900);            /* #1E3A8A — wordmark, CTA fills */
+  --brand-hover: var(--blue-950);      /* #172554 */
+  --brand-accent: var(--blue-500);     /* #3B82F6 — primary-base, links, focus */
+  --brand-soft: var(--blue-50);        /* #EFF6FF — tinted surfaces */
+  --brand-on: var(--gray-0);           /* text/icon on brand */
+
+  /* ── Surfaces ─────────────────────────────────────────────── */
+  --surface-page: var(--bg-white-0);   /* app background (white) */
+  --surface-card: var(--gray-0);       /* cards, sheets */
+  --surface-sunken: var(--bg-weak-50); /* #F9FAFB — wells, table headers */
+  --surface-inverse: var(--gray-950);
+
+  /* ── Text ─────────────────────────────────────────────────── */
+  --text-title: var(--text-strong-900);
+  --text-body: var(--text-sub-500);
+  --text-muted: var(--text-soft-400);
+  --text-disabled: var(--text-disabled-300);
+  --text-on-brand: var(--gray-0);
+  --text-link: var(--primary-link-button);
+
+  /* ── Borders ──────────────────────────────────────────────── */
+  --border-subtle: var(--stroke-soft-200); /* hairlines, card edges */
+  --border-default: var(--stroke-sub-300);
+  --border-strong: var(--stroke-strong-950);
+
+  /* ── Resolved radius (px) ─────────────────────────────────── */
+  --r-4: calc(var(--radius-4) * 1px);
+  --r-6: calc(var(--radius-6) * 1px);
+  --r-8: calc(var(--radius-8) * 1px);
+  --r-10: calc(var(--radius-10) * 1px);
+  --r-12: calc(var(--radius-12) * 1px);
+  --r-16: calc(var(--radius-16) * 1px);
+  --r-20: calc(var(--radius-20) * 1px);
+  --r-24: calc(var(--radius-24) * 1px);
+  --r-full: 999px;
+
+  /* ── Resolved spacing (px) ────────────────────────────────── */
+  --sp-4: 4px;   --sp-8: 8px;   --sp-12: 12px; --sp-16: 16px;
+  --sp-20: 20px; --sp-24: 24px; --sp-32: 32px; --sp-40: 40px;
+  --sp-48: 48px; --sp-64: 64px; --sp-80: 80px;
+}

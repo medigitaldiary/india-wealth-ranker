@@ -1,0 +1,50 @@
+/* BondScanner — Typography tokens
+   Families, weights, and the full type scale (Display / Heading / Body / Data /
+   Overline). Reconstructed from the BondScanner type specimen + Figma metadata
+   (Inter Regular/Medium/SemiBold, Inter Display Medium/SemiBold).
+   Financial figures always use the --data-* styles (tabular + slashed-zero). */
+
+:root {
+  /* ── Families ─────────────────────────────────────────────── */
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --font-serif-display: "DM Serif Display", ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: "Inter", ui-monospace, "SF Mono", Menlo, monospace; /* used with tabular-nums */
+
+  /* ── Weights ──────────────────────────────────────────────── */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+
+  /* OpenType: single-story a everywhere; tabular slashed-zero for figures */
+  --ot-ui: "cv11" 1; /* @kind other */
+  --ot-numeric: tabular-nums slashed-zero; /* @kind other */
+
+  /* ── Display ──────────────────────────────────────────────── */
+  --display-xl-size: 58px;   --display-xl-line: 68px;   --display-xl-weight: var(--weight-semibold); --display-xl-tracking: -0.025em;
+  --display-lg-size: 48px;   --display-lg-line: 56px;   --display-lg-weight: var(--weight-semibold); --display-lg-tracking: -0.022em;
+
+  /* ── Headings (Inter Display) ─────────────────────────────── */
+  --h1-size: 36px;  --h1-line: 44px;  --h1-weight: var(--weight-semibold); --h1-tracking: -0.018em;
+  --h2-size: 28px;  --h2-line: 36px;  --h2-weight: var(--weight-semibold); --h2-tracking: -0.012em;
+  --h3-size: 24px;  --h3-line: 32px;  --h3-weight: var(--weight-semibold); --h3-tracking: -0.008em;
+  --h4-size: 20px;  --h4-line: 28px;  --h4-weight: var(--weight-semibold); --h4-tracking: -0.004em;
+  --h5-size: 18px;  --h5-line: 26px;  --h5-weight: var(--weight-semibold); --h5-tracking: 0em;
+
+  /* ── Body (Inter) ─────────────────────────────────────────── */
+  --body-lg-size: 18px;  --body-lg-line: 28px;
+  --body-md-size: 16px;  --body-md-line: 24px;
+  --body-sm-size: 14px;  --body-sm-line: 20px;
+  --body-xs-size: 12px;  --body-xs-line: 16px;
+
+  /* ── Data / numerics (Inter Display) ──────────────────────── */
+  --data-lg-size: 28px;  --data-lg-line: 36px;  --data-lg-weight: var(--weight-semibold);
+  --data-md-size: 20px;  --data-md-line: 28px;  --data-md-weight: var(--weight-semibold);
+  --data-sm-size: 14px;  --data-sm-line: 20px;  --data-sm-weight: var(--weight-medium);
+
+  /* ── Labels / overline ────────────────────────────────────── */
+  --label-md-size: 14px;  --label-md-line: 20px;  --label-md-weight: var(--weight-medium);
+  --label-sm-size: 12px;  --label-sm-line: 16px;  --label-sm-weight: var(--weight-medium);
+  --overline-size: 12px;  --overline-line: 16px;  --overline-weight: var(--weight-medium); --overline-tracking: 0.06em;
+}

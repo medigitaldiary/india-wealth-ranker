@@ -1,0 +1,24 @@
+/* BondScanner — Elevation & focus rings
+   AlignUI-style soft shadows: cool, low-opacity, layered. Cards sit on a 1px
+   stroke + a barely-there shadow; menus/popovers lift higher. Focus uses a
+   tinted 3–4px ring in the active accent color. */
+
+:root {
+  /* Resting elevation ladder */
+  --shadow-xs: 0 1px 2px 0 rgba(10, 13, 20, 0.03);
+  --shadow-sm: 0 2px 4px 0 rgba(27, 28, 29, 0.04);
+  --shadow-md: 0 16px 32px -12px rgba(14, 18, 27, 0.10);
+  --shadow-lg: 0 16px 40px -8px rgba(14, 18, 27, 0.12);
+  --shadow-xl: 0 24px 56px -12px rgba(14, 18, 27, 0.16);
+
+  /* Buttons & toggles: subtle outer + inset top highlight */
+  --shadow-button: 0 1px 2px 0 rgba(14, 18, 27, 0.06);
+  --shadow-button-primary: 0 1px 2px 0 rgba(14, 18, 27, 0.12);
+  --shadow-toggle: 0 6px 10px 0 rgba(14, 18, 27, 0.10), 0 2px 4px 0 rgba(14, 18, 27, 0.06);
+
+  /* Focus rings (semantic-state tinted) */
+  --ring-width: 3px;
+  --ring-primary: 0 0 0 var(--ring-width) var(--alpha-blue-alpha-16);
+  --ring-neutral: 0 0 0 var(--ring-width) var(--alpha-gray-alpha-16);
+  --ring-error: 0 0 0 var(--ring-width) var(--alpha-red-alpha-16);
+}

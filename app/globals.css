@@ -1,26 +1,84 @@
 @import "tailwindcss";
 
+/* ── BondScanner Design System tokens (vendored, source of truth) ──
+   Order matters only for readability; CSS custom props resolve lazily. */
+@import "../styles/tokens/fig-tokens.css";
+@import "../styles/tokens/typography.css";
+@import "../styles/tokens/shadows.css";
+@import "../styles/tokens/brand.css";
+
+/* ── Font wiring ──────────────────────────────────────────────────
+   Override the DS family tokens to point at the next/font instances
+   (Inter + DM Serif Display) loaded in layout.tsx. Keeps DS tokens as
+   the source of truth while getting self-optimized, non-blocking fonts. */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-display: var(--font-inter), -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, sans-serif;
+  --font-serif-display: var(--font-dm-serif), ui-serif, Georgia,
+    "Times New Roman", serif;
 }
 
+/* ── Expose brand tokens as Tailwind utilities ──────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-brand: var(--brand);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-soft: var(--brand-soft);
+
+  --color-surface-page: var(--surface-page);
+  --color-surface-card: var(--surface-card);
+  --color-surface-sunken: var(--surface-sunken);
+
+  --color-text-title: var(--text-title);
+  --color-text-body: var(--text-body);
+  --color-text-muted: var(--text-muted);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border-default: var(--border-default);
+  --color-border-strong: var(--border-strong);
+
+  --color-success: var(--state-success-base);
+  --color-warning: var(--state-warning-base);
+  --color-error: var(--state-error-base);
+  --color-verified: var(--state-verified-base);
+
+  --font-sans: var(--font-sans);
+  --font-serif: var(--font-serif-display);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
+/* ── Base: crystal / liquid — white glass on gray-50, blue light ── */
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--surface-sunken); /* gray-50 app background */
+  color: var(--text-title);
+  font-family: var(--font-sans);
+  font-feature-settings: var(--ot-ui); /* single-story a (cv11) */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings: Inter display cut, semibold, tight tracking */
+h1,
+h2,
+h3,
+h4,
+h5 {
+  font-family: var(--font-display);
+  font-optical-sizing: auto;
+  font-weight: var(--weight-semibold);
+}
+
+/* Money / figures: always tabular + slashed-zero, Indian grouping */
+.num {
+  font-variant-numeric: tabular-nums slashed-zero;
+  font-feature-settings: "tnum" 1, "zero" 1;
+}
+
+/* Prevent mobile horizontal scroll (UI-audit note) */
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100vw;
 }
