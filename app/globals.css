@@ -76,6 +76,31 @@ h5 {
   font-feature-settings: "tnum" 1, "zero" 1;
 }
 
+/* Skeleton shimmer for loading states (leaderboard, forms) */
+@keyframes iwr-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--gray-100) 25%,
+    var(--gray-0) 50%,
+    var(--gray-100) 75%
+  );
+  background-size: 200% 100%;
+  animation: iwr-shimmer 1.5s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shimmer {
+    animation: none;
+  }
+}
+
 /* Prevent mobile horizontal scroll (UI-audit note) */
 html,
 body {

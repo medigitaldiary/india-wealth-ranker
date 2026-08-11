@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { motion, type Variants } from "framer-motion";
 import { TierBadge } from "@/components/quest/TierBadge";
 import { useQuestStore } from "@/lib/store/questStore";
 import { useHydrated } from "@/lib/hooks/useHydrated";
@@ -16,6 +17,19 @@ interface Row {
   org?: string;
 }
 
+const list: Variants = {
+  show: { transition: { staggerChildren: 0.05 } },
+};
+
+const rowIn: Variants = {
+  hidden: { opacity: 0, y: 8 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: [0.4, 0, 0.2, 1] as [number, number, number, number] },
+  },
+};
+
 export function LeaderboardList() {
   const hydrated = useHydrated();
   const myTier = useQuestStore((s) => s.tier);
@@ -28,15 +42,29 @@ export function LeaderboardList() {
       .catch(() => setRows([]));
   }, []);
 
+  // Loading: shimmering skeleton rows.
   if (!rows) {
     return (
-      <div className="flex flex-col gap-2 animate-pulse" aria-hidden>
-        {Array.from({ length: 6 }).map((_, i) => (
-          <div
-            key={i}
-            className="h-16 rounded-[var(--r-12)] bg-surface-sunken border border-border-subtle"
-          />
-        ))}
+      <div className="flex flex-col gap-3" aria-busy="true" aria-live="polite">
+        <p className="text-text-muted" style={{ fontSize: "var(--body-xs-size)" }}>
+          Loading the leaderboard…
+        </p>
+        <div className="flex flex-col gap-2">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center gap-3 rounded-[var(--r-12)] border border-border-subtle bg-surface-card px-4 py-3"
+              style={{ boxShadow: "var(--shadow-xs)" }}
+            >
+              <div className="shimmer h-5 w-5 rounded-md shrink-0" />
+              <div className="flex flex-col gap-2 min-w-0 flex-1">
+                <div className="shimmer h-4 rounded" style={{ width: `${55 - i * 3}%` }} />
+                <div className="shimmer h-3 w-24 rounded" />
+              </div>
+              <div className="shimmer h-4 w-14 rounded shrink-0" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
@@ -51,13 +79,19 @@ export function LeaderboardList() {
           : "The top 10 are India's wealthiest, shown as public benchmarks. Finish your quest to be the first player on the board."}
       </p>
 
-      <ol className="flex flex-col gap-2">
+      <motion.ol
+        className="flex flex-col gap-2"
+        initial="hidden"
+        animate="show"
+        variants={list}
+      >
         {rows.map((row) => {
           const tier = TIER_BY_ID[row.tier as TierId];
           const mine = !row.benchmark && hydrated && myTier === row.tier;
           return (
-            <li
+            <motion.li
               key={`${row.rank}-${row.displayName}`}
+              variants={rowIn}
               className="flex items-center gap-3 rounded-[var(--r-12)] border bg-surface-card px-4 py-3"
               style={{
                 boxShadow: "var(--shadow-xs)",
@@ -108,10 +142,10 @@ export function LeaderboardList() {
                   Top {formatTopPercent(Math.round((100 - row.percentile) * 100) / 100)}
                 </span>
               )}
-            </li>
+            </motion.li>
           );
         })}
-      </ol>
+      </motion.ol>
 
       <p className="text-text-muted" style={{ fontSize: "var(--body-xs-size)" }}>
         Wealthiest figures are approximate public estimates, shown for comparison only.
