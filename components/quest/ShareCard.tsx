@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/bondscanner/core/Button";
 import { APP_URL, APP_NAME } from "@/lib/config";
 
@@ -16,8 +15,6 @@ export function ShareCard({
   topPercentLabel: string;
   tierName: string;
 }) {
-  const [copied, setCopied] = useState(false);
-
   const text = `I'm in the Top ${topPercentLabel} of India's wealth hierarchy (${tierName}). Where do you rank?`;
   const shareText = `${text} ${APP_URL}`;
 
@@ -29,16 +26,6 @@ export function ShareCard({
     );
   };
 
-  const onCopy = async () => {
-    try {
-      await navigator.clipboard.writeText(shareText);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
-    } catch {
-      /* clipboard blocked — ignore */
-    }
-  };
-
   const onNativeShare = async () => {
     if (navigator.share) {
       try {
@@ -47,7 +34,11 @@ export function ShareCard({
         /* user dismissed — ignore */
       }
     } else {
-      onCopy();
+      try {
+        await navigator.clipboard.writeText(shareText);
+      } catch {
+        /* clipboard blocked — ignore */
+      }
     }
   };
 
@@ -80,17 +71,6 @@ export function ShareCard({
           className="flex-1"
         >
           Share
-        </Button>
-        <Button
-          variant="secondary"
-          size="md"
-          onClick={onCopy}
-          leadingIcon={
-            <i className={copied ? "ri-check-line text-lg" : "ri-link text-lg"} aria-hidden />
-          }
-          className="flex-1"
-        >
-          {copied ? "Copied!" : "Copy link"}
         </Button>
       </div>
     </div>

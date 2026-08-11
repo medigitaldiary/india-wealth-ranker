@@ -28,6 +28,8 @@ export async function POST(req: Request) {
   }
 
   try {
+    // Upsert on phone: a repeat visitor updates their existing row (and we
+    // return the same lead id) instead of creating a duplicate lead.
     const [row] = await getDb()
       .insert(leads)
       .values({
@@ -35,6 +37,10 @@ export async function POST(req: Request) {
         phone,
         city: parsed.data.city ?? null,
         tier: "rising-aspirant", // entry tier awarded at lead capture
+      })
+      .onConflictDoUpdate({
+        target: leads.phone,
+        set: { fullName: parsed.data.fullName, city: parsed.data.city ?? null },
       })
       .returning({ id: leads.id });
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand/BrandLogo";
+import { SignUpButton } from "@/components/SignUpButton";
 import { LeaderboardList } from "@/components/leaderboard/LeaderboardList";
 
 export default function LeaderboardPage() {
@@ -10,12 +11,7 @@ export default function LeaderboardPage() {
           <Link href="/" aria-label="BondScanner home">
             <BrandLogo size={30} />
           </Link>
-          <Link
-            href="/rank"
-            className="text-sm font-medium text-brand-accent hover:text-brand-hover transition-colors"
-          >
-            Check my rank →
-          </Link>
+          <SignUpButton />
         </div>
       </header>
       <main className="flex-1 flex flex-col items-center px-4 sm:px-6 py-8 sm:py-12">

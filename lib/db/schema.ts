@@ -15,7 +15,7 @@ export const leads = pgTable(
   {
     id: serial("id").primaryKey(),
     fullName: text("full_name").notNull(),
-    phone: varchar("phone", { length: 16 }).notNull(), // +91XXXXXXXXXX
+    phone: varchar("phone", { length: 16 }).notNull().unique(), // +91XXXXXXXXXX — unique so a repeat visitor updates one row
     city: text("city"), // optional; powers "User from <city>" leaderboard handle
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     // Denormalised final rank so we can pull leaderboard fast.
@@ -23,14 +23,15 @@ export const leads = pgTable(
     percentile: numeric("percentile", { precision: 5, scale: 2 }),
     tier: text("tier"), // 'rising-aspirant' | 'comfortable-middle' | 'top-10-percent' | 'elite-1-percent'
   },
-  (t) => [index("leads_phone_idx").on(t.phone)],
 );
 
 export const leaderboardEntries = pgTable(
   "leaderboard_entries",
   {
     id: serial("id").primaryKey(),
-    leadId: integer("lead_id").references(() => leads.id, { onDelete: "cascade" }),
+    leadId: integer("lead_id")
+      .references(() => leads.id, { onDelete: "cascade" })
+      .unique(), // one leaderboard row per lead
     displayName: text("display_name").notNull(), // anonymised, e.g. "Aspirant #482"
     tier: text("tier").notNull(),
     percentile: numeric("percentile", { precision: 5, scale: 2 }).notNull(),

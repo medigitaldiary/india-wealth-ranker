@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand/BrandLogo";
+import { SignUpButton } from "@/components/SignUpButton";
 
 export default function LandingPage() {
   return (
@@ -8,12 +9,7 @@ export default function LandingPage() {
       <header className="w-full border-b border-border-subtle bg-surface-card">
         <div className="mx-auto max-w-[1216px] px-6 h-16 flex items-center justify-between">
           <BrandLogo size={32} />
-          <Link
-            href="/rank"
-            className="text-sm font-medium text-brand-accent hover:text-brand-hover transition-colors"
-          >
-            Check my rank →
-          </Link>
+          <SignUpButton />
         </div>
       </header>
 
@@ -69,6 +65,14 @@ export default function LandingPage() {
             >
               Reveal my rank
               <i className="ri-arrow-right-line text-lg" aria-hidden />
+            </Link>
+            <Link
+              href="/leaderboard"
+              className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[var(--r-10)] bg-surface-card text-text-title border border-border-default font-medium text-base hover:bg-surface-sunken hover:border-border-strong active:translate-y-[0.5px] transition-all w-full sm:w-auto"
+              style={{ boxShadow: "var(--shadow-xs)" }}
+            >
+              <i className="ri-bar-chart-2-line text-lg" aria-hidden />
+              Global Leaderboard
             </Link>
           </div>
 

@@ -15,6 +15,13 @@
       "when": 1786443378327,
       "tag": "0001_lowly_leopardon",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786466218338,
+      "tag": "0002_curved_network",
+      "breakpoints": true
     }
   ]
 }

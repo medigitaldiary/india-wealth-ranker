@@ -53,17 +53,29 @@ export async function POST(req: Request) {
     }
 
     // Anonymized leaderboard entry — PII stripped by the helper (PRD §4.4).
+    // Upsert on leadId so re-running the reveal updates the same row rather
+    // than piling up duplicates (leadId is unique).
     const profile = anonymizeForLeaderboard({
       city,
       tier: rank.tier,
       percentile: rank.percentile,
     });
-    await db.insert(leaderboardEntries).values({
-      leadId: leadId ?? null,
-      displayName: profile.displayName,
-      tier: rank.status_tier,
-      percentile: pctStr,
-    });
+    await db
+      .insert(leaderboardEntries)
+      .values({
+        leadId: leadId ?? null,
+        displayName: profile.displayName,
+        tier: rank.status_tier,
+        percentile: pctStr,
+      })
+      .onConflictDoUpdate({
+        target: leaderboardEntries.leadId,
+        set: {
+          displayName: profile.displayName,
+          tier: rank.status_tier,
+          percentile: pctStr,
+        },
+      });
 
     return NextResponse.json({ ...result, persisted: true });
   } catch (err) {
