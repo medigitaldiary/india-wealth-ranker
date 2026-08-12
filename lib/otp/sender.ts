@@ -4,8 +4,10 @@
  * verification; the sender is delivery-only.
  *
  *  - "mock"   : no SMS; the code is returned to the caller for dev/preview.
- *  - "dakiya" : POST to dakiya's /communication/send, which routes to Times
- *               (Smartping) using its OTP credentials + DLT template.
+ *  - "dakiya" : POST to dakiya's /communication/send. dakiya looks up the SMS
+ *               template registered under OTP_TEMPLATE_ID (its sms_config), renders
+ *               "{{key}}" placeholders from `params`, and sends via its configured
+ *               vendor (Times / Smartping) using its OTP credentials.
  */
 export type OtpDriver = "mock" | "dakiya";
 
@@ -23,15 +25,15 @@ const mockSender: OtpSender = {
   },
 };
 
-// NOTE: payload shape is provisional until the dakiya details are confirmed
-// (channel enum format, exact DLT param key, auth header). Only runs when
-// OTP_DRIVER=dakiya, so the mock path is unaffected.
 const dakiyaSender: OtpSender = {
   async send(phone, code) {
     const base = process.env.DAKIYA_URL;
     if (!base) throw new Error("DAKIYA_URL is not set");
 
-    const res = await fetch(`${base}/communication/send`, {
+    // The placeholder key in the registered DLT template, e.g. {{otp}}.
+    const paramKey = process.env.OTP_TEMPLATE_PARAM || "otp";
+
+    const res = await fetch(`${base.replace(/\/$/, "")}/communication/send`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -41,15 +43,16 @@ const dakiyaSender: OtpSender = {
       },
       body: JSON.stringify({
         channel: "COMMUNICATION_CHANNEL_SMS",
-        type: "OTP",
+        type: "OTP", // routes dakiya to the Times/Smartping OTP credentials
         templateId: process.env.OTP_TEMPLATE_ID,
-        params: { otp: code },
+        params: { [paramKey]: code },
         userDetails: { mobileNumber: phone },
       }),
     });
 
     if (!res.ok) {
-      throw new Error(`dakiya send failed: ${res.status}`);
+      const detail = await res.text().catch(() => "");
+      throw new Error(`dakiya send failed: ${res.status} ${detail}`.trim());
     }
   },
 };
