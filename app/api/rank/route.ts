@@ -61,7 +61,9 @@ export async function POST(req: Request) {
     return NextResponse.json({
       ok: true,
       air: ahead + 1,
-      totalParticipants: total,
+      // When there's no lead, this ranker isn't counted in `total`; include
+      // them so the rank can never exceed the participant count.
+      totalParticipants: leadId ? total : total + 1,
       totalWealth: wealth,
       persisted: true,
     });
