@@ -67,38 +67,8 @@ export default function LandingPage() {
               <i className="ri-arrow-right-line text-lg" aria-hidden />
             </Link>
           </div>
-
-          {/* Trust strip — crystal card */}
-          <div
-            className="mt-10 w-full rounded-[var(--r-16)] border border-border-subtle bg-surface-card px-6 py-6 grid grid-cols-3 gap-4"
-            style={{ boxShadow: "var(--shadow-xs)" }}
-          >
-            <Stat value="10,000+" label="Ranks calculated" />
-            <Stat value="Top 1%" label="Elite tier tracked" />
-            <Stat value="60 sec" label="To your result" />
-          </div>
         </div>
       </main>
     </>
-  );
-}
-
-function Stat({ value, label }: { value: string; label: string }) {
-  return (
-    <div className="flex flex-col gap-1 items-center">
-      <span
-        className="num text-brand"
-        style={{
-          fontSize: "var(--data-md-size)",
-          lineHeight: "var(--data-md-line)",
-          fontWeight: "var(--weight-semibold)",
-        }}
-      >
-        {value}
-      </span>
-      <span className="text-xs sm:text-sm text-text-muted text-center">
-        {label}
-      </span>
-    </div>
   );
 }
