@@ -28,7 +28,7 @@ export default function LandingPage() {
             }}
           >
             <i className="ri-compass-3-line text-base" aria-hidden />
-            A BondScanner tool
+            Find your AIR · A BondScanner tool
           </span>
 
           {/* Headline */}
@@ -41,7 +41,7 @@ export default function LandingPage() {
               letterSpacing: "var(--display-lg-tracking)",
             }}
           >
-            Where do you stand in India&apos;s wealth hierarchy?
+            What&apos;s your All India Wealth Rank?
           </h1>
 
           {/* Subhead */}
@@ -52,8 +52,8 @@ export default function LandingPage() {
               lineHeight: "var(--body-lg-line)",
             }}
           >
-            In about a minute you&apos;ll see your exact wealth percentile, and
-            just how close you are to India&apos;s top 1%.
+            Add up what you own, and in under a minute find out exactly where
+            you rank among everyone who&apos;s played.
           </p>
 
           {/* CTA */}
@@ -63,16 +63,8 @@ export default function LandingPage() {
               className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[var(--r-10)] bg-brand text-[var(--text-on-brand)] font-medium text-base hover:bg-brand-hover active:translate-y-[0.5px] transition-all w-full sm:w-auto"
               style={{ boxShadow: "var(--shadow-button-primary)" }}
             >
-              Reveal my rank
+              Find my rank
               <i className="ri-arrow-right-line text-lg" aria-hidden />
-            </Link>
-            <Link
-              href="/leaderboard"
-              className="inline-flex items-center justify-center gap-2 h-11 px-5 rounded-[var(--r-10)] bg-surface-card text-text-title border border-border-default font-medium text-base hover:bg-surface-sunken hover:border-border-strong active:translate-y-[0.5px] transition-all w-full sm:w-auto"
-              style={{ boxShadow: "var(--shadow-xs)" }}
-            >
-              <i className="ri-bar-chart-2-line text-lg" aria-hidden />
-              Global Leaderboard
             </Link>
           </div>
 

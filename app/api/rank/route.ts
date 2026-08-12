@@ -1,17 +1,18 @@
 import { NextResponse } from "next/server";
-import { rankSchema } from "@/lib/validation/schemas";
-import { netWorth as calcNetWorth } from "@/lib/wealth/calculate";
-import { calculateUserRank } from "@/lib/wealth/ranking";
-import { anonymizeForLeaderboard } from "@/lib/wealth/anonymize";
-import { getDb, hasDatabase } from "@/lib/db/client";
-import { leads, leaderboardEntries } from "@/lib/db/schema";
 import { eq } from "drizzle-orm";
+import { rankSchema } from "@/lib/validation/schemas";
+import { totalWealth } from "@/lib/wealth/calculate";
+import { calculateUserRank } from "@/lib/wealth/ranking";
+import { getDb, hasDatabase } from "@/lib/db/client";
+import { leads } from "@/lib/db/schema";
 
 /**
- * Computes the final wealth rank server-side (authoritative), then — when a DB
- * is configured — updates the lead row and appends an anonymized leaderboard
- * entry. Net worth is recomputed here from the raw amounts, never trusted from
- * the client.
+ * Computes the rank server-side (authoritative) and, when a DB is configured,
+ * stores the lead's total wealth. Total wealth is recomputed here from the raw
+ * amounts, never trusted from the client.
+ *
+ * NOTE (Phase 1 interim): still returns the old percentile/tier. Phase 2
+ * replaces this with the participant-based All India Rank.
  */
 export async function POST(req: Request) {
   const json = await req.json().catch(() => null);
@@ -24,13 +25,13 @@ export async function POST(req: Request) {
     );
   }
 
-  const { assets, liabilities, leadId, city } = parsed.data;
-  const nw = calcNetWorth(assets, liabilities);
-  const rank = calculateUserRank(nw); // handles ≤0 → rising-aspirant
+  const { assets, leadId } = parsed.data;
+  const wealth = totalWealth(assets);
+  const rank = calculateUserRank(wealth);
 
   const result = {
     ok: true as const,
-    netWorth: nw,
+    totalWealth: wealth,
     percentile: rank.percentile,
     topPercent: rank.topPercent,
     tier: rank.status_tier,
@@ -42,45 +43,19 @@ export async function POST(req: Request) {
   }
 
   try {
-    const db = getDb();
-    const pctStr = rank.percentile.toFixed(2);
-
     if (leadId) {
-      await db
+      await getDb()
         .update(leads)
-        .set({ netWorthInr: Math.round(nw), percentile: pctStr, tier: rank.status_tier })
+        .set({
+          netWorthInr: Math.round(wealth),
+          percentile: rank.percentile.toFixed(2),
+          tier: rank.status_tier,
+        })
         .where(eq(leads.id, leadId));
     }
-
-    // Anonymized leaderboard entry — PII stripped by the helper (PRD §4.4).
-    // Upsert on leadId so re-running the reveal updates the same row rather
-    // than piling up duplicates (leadId is unique).
-    const profile = anonymizeForLeaderboard({
-      city,
-      tier: rank.tier,
-      percentile: rank.percentile,
-    });
-    await db
-      .insert(leaderboardEntries)
-      .values({
-        leadId: leadId ?? null,
-        displayName: profile.displayName,
-        tier: rank.status_tier,
-        percentile: pctStr,
-      })
-      .onConflictDoUpdate({
-        target: leaderboardEntries.leadId,
-        set: {
-          displayName: profile.displayName,
-          tier: rank.status_tier,
-          percentile: pctStr,
-        },
-      });
-
     return NextResponse.json({ ...result, persisted: true });
   } catch (err) {
     console.error("[api/rank] persist failed:", err);
-    // Still return the computed rank — persistence is best-effort.
     return NextResponse.json(result);
   }
 }

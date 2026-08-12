@@ -1,39 +1,41 @@
 import { z } from "zod";
 
-/**
- * Lead capture (Level 1). Error messages state the fix, per BondScanner voice
- * ("Enter a valid 10-digit mobile number"), and are surfaced inline — the CTA
- * is never permanently disabled (fix for the prior-audit issue).
- */
-export const leadSchema = z.object({
-  fullName: z
-    .string()
-    .trim()
-    .min(2, "Enter your full name")
-    .max(60, "That name looks too long")
-    .regex(/^[A-Za-z][A-Za-z .'-]*$/, "Letters, spaces, and . ' - only"),
-  // 10 Indian mobile digits, stored without the +91 prefix.
-  phone: z
-    .string()
-    .trim()
-    .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number"),
-  // Optional — powers the anonymized "User from <city>" leaderboard handle.
-  city: z.string().trim().max(60, "That city name looks too long").optional(),
-});
+const firstName = z
+  .string()
+  .trim()
+  .min(1, "Enter your first name")
+  .max(40, "That name looks too long")
+  .regex(/^[A-Za-z][A-Za-z .'-]*$/, "Letters, spaces, and . ' - only");
 
+const lastName = z
+  .string()
+  .trim()
+  .min(1, "Enter your last name")
+  .max(40, "That name looks too long")
+  .regex(/^[A-Za-z][A-Za-z .'-]*$/, "Letters, spaces, and . ' - only");
+
+// 10 Indian mobile digits, stored without the +91 prefix.
+const phone = z
+  .string()
+  .trim()
+  .regex(/^[6-9]\d{9}$/, "Enter a valid 10-digit mobile number");
+
+/** Step 1 — name only. */
+export const nameSchema = z.object({ firstName, lastName });
+export type NameInput = z.infer<typeof nameSchema>;
+
+/** Phone step — number only. */
+export const phoneSchema = z.object({ phone });
+export type PhoneInput = z.infer<typeof phoneSchema>;
+
+/** Full lead payload written to the DB (deduped on phone). */
+export const leadSchema = z.object({ firstName, lastName, phone });
 export type LeadInput = z.infer<typeof leadSchema>;
 
-/**
- * Rank computation payload. Amount maps are recomputed server-side (never trust
- * a client-sent net worth), so the leaderboard stays honest.
- */
+/** Rank computation payload — assets are recomputed server-side. */
 const amountMap = z.record(z.string(), z.number().nonnegative()).default({});
-
 export const rankSchema = z.object({
   assets: amountMap,
-  liabilities: amountMap,
   leadId: z.number().int().nullable().optional(),
-  city: z.string().trim().max(60).optional(),
 });
-
 export type RankInput = z.infer<typeof rankSchema>;

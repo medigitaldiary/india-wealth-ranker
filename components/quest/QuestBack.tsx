@@ -7,8 +7,8 @@ import { Button } from "@/components/bondscanner/core/Button";
 const PREV: Record<string, string> = {
   "/rank": "/",
   "/rank/portfolio": "/rank",
-  "/rank/leverage": "/rank/portfolio",
-  "/rank/reveal": "/rank/leverage",
+  "/rank/verify": "/rank/portfolio",
+  "/rank/reveal": "/rank/verify",
 };
 
 /**

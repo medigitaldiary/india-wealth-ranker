@@ -1,6 +1,6 @@
-import { LeadCaptureForm } from "@/components/quest/LeadCaptureForm";
+import { NameForm } from "@/components/quest/NameForm";
 
-export default function Level1Page() {
+export default function NamePage() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
@@ -14,7 +14,7 @@ export default function Level1Page() {
           }}
         >
           <i className="ri-user-line text-base" aria-hidden />
-          Level 1 · The Foundation
+          Step 1 · You
         </span>
         <h1
           className="text-text-title"
@@ -25,18 +25,13 @@ export default function Level1Page() {
             fontWeight: "var(--weight-semibold)",
           }}
         >
-          Let&apos;s start with you
+          What&apos;s your name?
         </h1>
         <p
           className="text-text-body"
-          style={{
-            fontSize: "var(--body-md-size)",
-            lineHeight: "var(--body-md-line)",
-          }}
+          style={{ fontSize: "var(--body-md-size)", lineHeight: "var(--body-md-line)" }}
         >
-          Two quick details and you&apos;re on the board as a{" "}
-          <strong className="text-text-title">Rising Aspirant</strong>. Then we
-          tally up everything you own.
+          We&apos;ll use it to personalise your All India Rank.
         </p>
       </header>
 
@@ -44,7 +39,7 @@ export default function Level1Page() {
         className="rounded-[var(--r-16)] border border-border-subtle bg-surface-card p-6 sm:p-7"
         style={{ boxShadow: "var(--shadow-xs)" }}
       >
-        <LeadCaptureForm />
+        <NameForm />
       </div>
     </div>
   );

@@ -1,68 +1,65 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
 import CountUp from "react-countup";
-import { Button } from "@/components/bondscanner/core/Button";
 import { LogoMark } from "@/components/bondscanner/brand/Logo";
 import { TierBadge } from "./TierBadge";
 import { ShareCard } from "./ShareCard";
 import { useQuestStore } from "@/lib/store/questStore";
 import { useHydrated } from "@/lib/hooks/useHydrated";
-import { netWorth as calcNetWorth } from "@/lib/wealth/calculate";
+import { totalWealth } from "@/lib/wealth/calculate";
 import { buildComparison, formatTopPercent } from "@/lib/wealth/ranking";
 import { formatInr } from "@/lib/utils";
 import { BONDSCANNER_URL } from "@/lib/config";
 
 const inr = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
 
+// NOTE (Phase 1 interim): the hero still shows the old "Top X%" percentile.
+// Phase 2 swaps this for the participant-based All India Rank number.
 export function RankReveal() {
   const router = useRouter();
   const hydrated = useHydrated();
-  const fullName = useQuestStore((s) => s.fullName);
+  const firstName = useQuestStore((s) => s.firstName);
+  const phoneVerified = useQuestStore((s) => s.phoneVerified);
   const assets = useQuestStore((s) => s.assets);
-  const liabilities = useQuestStore((s) => s.liabilities);
   const leadId = useQuestStore((s) => s.leadId);
-  const city = useQuestStore((s) => s.city);
-  const unlockTier = useQuestStore((s) => s.unlockTier);
   const reachLevel = useQuestStore((s) => s.reachLevel);
 
   const [phase, setPhase] = useState<"calculating" | "revealed">("calculating");
   const posted = useRef(false);
 
-  const nw = calcNetWorth(assets, liabilities);
-  const comparison = buildComparison(nw);
+  const wealth = totalWealth(assets);
+  const comparison = buildComparison(wealth);
   const tier = comparison.tier;
 
-  // Funnel guard.
+  // Funnel guard: name entered and phone verified.
   useEffect(() => {
-    if (hydrated && !fullName) router.replace("/rank");
-  }, [hydrated, fullName, router]);
+    if (hydrated && (!firstName || !phoneVerified)) router.replace("/rank");
+  }, [hydrated, firstName, phoneVerified, router]);
 
   // Reveal sequence + persist (once).
   useEffect(() => {
-    if (!hydrated || !fullName) return;
+    if (!hydrated || !firstName || !phoneVerified) return;
     const t = setTimeout(() => setPhase("revealed"), 1100);
 
     if (!posted.current) {
       posted.current = true;
-      unlockTier(tier.id);
       reachLevel(3);
       fetch("/api/rank", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assets, liabilities, leadId, city }),
+        body: JSON.stringify({ assets, leadId }),
       }).catch(() => {
         /* persistence is best-effort; the reveal is client-computed */
       });
     }
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hydrated, fullName]);
+  }, [hydrated, firstName, phoneVerified]);
 
-  if (!hydrated || !fullName) return null;
+  if (!hydrated || !firstName || !phoneVerified) return null;
 
   if (phase === "calculating") {
     return (
@@ -82,7 +79,6 @@ export function RankReveal() {
     );
   }
 
-  const firstName = fullName.trim().split(/\s+/)[0];
   const topLabel = formatTopPercent(comparison.topPercent);
   const isElite = tier.id === "elite-1-percent";
 
@@ -135,13 +131,9 @@ export function RankReveal() {
         </div>
       </motion.div>
 
-      {/* Net worth */}
+      {/* Total wealth */}
       <motion.div variants={fadeUp}>
-        <StatRow
-          label="Your net worth"
-          value={`${nw < 0 ? "−" : ""}₹${inr.format(Math.abs(Math.round(nw)))}`}
-          tone={nw < 0 ? "error" : "brand"}
-        />
+        <StatRow label="Your total wealth" value={`₹${inr.format(Math.round(wealth))}`} />
       </motion.div>
 
       {/* Comparison */}
@@ -191,7 +183,7 @@ export function RankReveal() {
         <ShareCard topPercentLabel={topLabel} tierName={tier.name} />
       </motion.div>
 
-      {/* Bonds CTA — retention metric (PRD §7) */}
+      {/* Bonds CTA */}
       <motion.a
         variants={fadeUp}
         href={BONDSCANNER_URL}
@@ -222,17 +214,6 @@ export function RankReveal() {
           aria-hidden
         />
       </motion.a>
-
-      <motion.div variants={fadeUp} className="text-center">
-        <Link
-          href="/leaderboard"
-          className="inline-flex items-center gap-1.5 text-brand-accent hover:text-brand-hover font-medium"
-          style={{ fontSize: "var(--body-sm-size)" }}
-        >
-          See the global leaderboard
-          <i className="ri-arrow-right-line" aria-hidden />
-        </Link>
-      </motion.div>
     </motion.div>
   );
 }
@@ -246,15 +227,7 @@ const fadeUp: Variants = {
   },
 };
 
-function StatRow({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone: "brand" | "error";
-}) {
+function StatRow({ label, value }: { label: string; value: string }) {
   return (
     <div
       className="rounded-[var(--r-16)] border border-border-subtle bg-surface-card px-5 py-4 flex items-center justify-between gap-4"
@@ -272,9 +245,8 @@ function StatRow({
         {label}
       </span>
       <span
-        className="num"
+        className="num text-brand"
         style={{
-          color: tone === "error" ? "var(--state-error-base)" : "var(--brand)",
           fontSize: "var(--data-lg-size)",
           lineHeight: "var(--data-lg-line)",
           fontWeight: "var(--weight-semibold)",

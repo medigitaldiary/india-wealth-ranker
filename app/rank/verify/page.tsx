@@ -1,6 +1,6 @@
-import { LiabilitiesForm } from "@/components/quest/LiabilitiesForm";
+import { PhoneForm } from "@/components/quest/PhoneForm";
 
-export default function Level3Page() {
+export default function VerifyPage() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
@@ -13,8 +13,8 @@ export default function Level3Page() {
             fontWeight: "var(--weight-medium)",
           }}
         >
-          <i className="ri-scales-3-line text-base" aria-hidden />
-          Level 3 · The Leverage
+          <i className="ri-shield-check-line text-base" aria-hidden />
+          Step 3 · Verify
         </span>
         <h1
           className="text-text-title"
@@ -25,20 +25,22 @@ export default function Level3Page() {
             fontWeight: "var(--weight-semibold)",
           }}
         >
-          What you owe
+          One last step
         </h1>
         <p
           className="text-text-body"
-          style={{
-            fontSize: "var(--body-md-size)",
-            lineHeight: "var(--body-md-line)",
-          }}
+          style={{ fontSize: "var(--body-md-size)", lineHeight: "var(--body-md-line)" }}
         >
-          Now subtract your debts. The ticker above becomes your real net worth.
+          Enter your number to unlock your All India Rank.
         </p>
       </header>
 
-      <LiabilitiesForm />
+      <div
+        className="rounded-[var(--r-16)] border border-border-subtle bg-surface-card p-6 sm:p-7"
+        style={{ boxShadow: "var(--shadow-xs)" }}
+      >
+        <PhoneForm />
+      </div>
     </div>
   );
 }

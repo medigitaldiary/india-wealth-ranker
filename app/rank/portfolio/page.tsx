@@ -1,6 +1,6 @@
 import { AssetsForm } from "@/components/quest/AssetsForm";
 
-export default function Level2Page() {
+export default function AssetsPage() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
@@ -14,7 +14,7 @@ export default function Level2Page() {
           }}
         >
           <i className="ri-wallet-3-line text-base" aria-hidden />
-          Level 2 · The Portfolio
+          Step 2 · Your wealth
         </span>
         <h1
           className="text-text-title"
@@ -29,13 +29,10 @@ export default function Level2Page() {
         </h1>
         <p
           className="text-text-body"
-          style={{
-            fontSize: "var(--body-md-size)",
-            lineHeight: "var(--body-md-line)",
-          }}
+          style={{ fontSize: "var(--body-md-size)", lineHeight: "var(--body-md-line)" }}
         >
-          Add up your assets and watch the total climb. None of it is shared
-          publicly.
+          Add up your assets and watch your total wealth climb. None of it is
+          shared publicly.
         </p>
       </header>
 

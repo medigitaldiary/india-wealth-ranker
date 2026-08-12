@@ -6,39 +6,38 @@ import { Button } from "@/components/bondscanner/core/Button";
 import { AmountGroups } from "./AmountGroups";
 import { NetWorthTicker } from "./NetWorthTicker";
 import { FormSkeleton } from "./FormSkeleton";
-import { ASSET_GROUPS } from "@/lib/wealth/inputs";
-import { totalAssets } from "@/lib/wealth/calculate";
+import { totalWealth } from "@/lib/wealth/calculate";
 import { useQuestStore } from "@/lib/store/questStore";
 import { useHydrated } from "@/lib/hooks/useHydrated";
 
 export function AssetsForm() {
   const router = useRouter();
   const hydrated = useHydrated();
-  const fullName = useQuestStore((s) => s.fullName);
+  const firstName = useQuestStore((s) => s.firstName);
   const assets = useQuestStore((s) => s.assets);
   const reachLevel = useQuestStore((s) => s.reachLevel);
 
-  // Funnel guard: must complete Level 1 first.
+  // Funnel guard: must have entered a name first.
   useEffect(() => {
-    if (hydrated && !fullName) router.replace("/rank");
-  }, [hydrated, fullName, router]);
+    if (hydrated && !firstName) router.replace("/rank");
+  }, [hydrated, firstName, router]);
 
   if (!hydrated) return <FormSkeleton />;
 
-  const total = totalAssets(assets);
+  const total = totalWealth(assets);
 
   const onContinue = () => {
     reachLevel(2);
-    router.push("/rank/leverage");
+    router.push("/rank/verify");
   };
 
   return (
     <div className="flex flex-col gap-6">
       <div className="sticky top-[76px] z-[5]">
-        <NetWorthTicker value={total} label="Assets so far" />
+        <NetWorthTicker value={total} label="Total wealth" />
       </div>
 
-      <AmountGroups groups={ASSET_GROUPS} kind="assets" />
+      <AmountGroups />
 
       <Button
         variant="primary"
@@ -46,7 +45,7 @@ export function AssetsForm() {
         onClick={onContinue}
         trailingIcon={<i className="ri-arrow-right-line text-lg" aria-hidden />}
       >
-        Continue to liabilities
+        Continue
       </Button>
       <p
         className="text-center text-text-muted"
