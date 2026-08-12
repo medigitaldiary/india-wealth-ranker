@@ -47,12 +47,6 @@ export function AssetsForm() {
       >
         Continue
       </Button>
-      <p
-        className="text-center text-text-muted"
-        style={{ fontSize: "var(--body-xs-size)", lineHeight: "var(--body-xs-line)" }}
-      >
-        Don&apos;t have something? Just leave it blank.
-      </p>
     </div>
   );
 }
