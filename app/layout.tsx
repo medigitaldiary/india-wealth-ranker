@@ -24,30 +24,29 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   ),
   title: {
-    default:
-      "India Wealth Ranker: see where your net worth stands in India",
+    default: "India Wealth Ranker: find your All India Wealth Rank",
     template: "%s | India Wealth Ranker",
   },
   description:
-    "Discover your wealth percentile in India. Compare your net worth against the general population, the top 10%, and the elite 1%. By BondScanner.",
+    "Add up what you own and find your All India Wealth Rank — exactly where you stand among everyone who's played. Free and takes a minute. By BondScanner.",
   keywords: [
+    "all india wealth rank",
     "wealth rank india",
-    "net worth percentile india",
     "india wealth calculator",
-    "top 1 percent india",
-    "wealth distribution india",
+    "total wealth rank india",
+    "find your air",
   ],
   openGraph: {
-    title: "India Wealth Ranker: are you in the top 1%?",
+    title: "What's your All India Wealth Rank?",
     description:
-      "Enter your assets & liabilities. See where you rank in India's wealth hierarchy.",
+      "Add up what you own and find out exactly where you rank in India.",
     type: "website",
     locale: "en_IN",
   },
   twitter: {
     card: "summary_large_image",
-    title: "India Wealth Ranker: are you in the top 1%?",
-    description: "See where you stand in India's wealth hierarchy.",
+    title: "What's your All India Wealth Rank?",
+    description: "Add up what you own and find out exactly where you rank in India.",
   },
 };
 
