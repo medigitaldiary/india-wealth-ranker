@@ -29,7 +29,7 @@ export async function POST(req: Request) {
 
   // No DB (local dev) → fixed dev code, no storage.
   if (!hasDatabase()) {
-    return NextResponse.json({ ok: true, cooldownSec, devCode: "000000" });
+    return NextResponse.json({ ok: true, cooldownSec, devCode: "0000" });
   }
 
   const db = getDb();

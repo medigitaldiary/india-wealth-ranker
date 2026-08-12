@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
   // No DB (local dev) → accept the fixed dev code.
   if (!hasDatabase()) {
-    return NextResponse.json({ ok: true, verified: code === "000000" });
+    return NextResponse.json({ ok: true, verified: code === "0000" });
   }
 
   const db = getDb();

@@ -28,10 +28,10 @@ export type NameInput = z.infer<typeof nameSchema>;
 export const phoneSchema = z.object({ phone });
 export type PhoneInput = z.infer<typeof phoneSchema>;
 
-/** OTP verify — phone + 6-digit code. */
+/** OTP verify — phone + 4-digit code. */
 export const otpVerifySchema = z.object({
   phone,
-  code: z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code"),
+  code: z.string().trim().regex(/^\d{4}$/, "Enter the 4-digit code"),
 });
 export type OtpVerifyInput = z.infer<typeof otpVerifySchema>;
 

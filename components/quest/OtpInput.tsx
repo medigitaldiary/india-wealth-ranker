@@ -4,7 +4,7 @@ import { useRef } from "react";
 
 /**
  * Six single-digit boxes for OTP entry, with auto-advance, backspace-to-prev,
- * and paste support. Controlled via `value` (up to 6 digits).
+ * and paste support. Controlled via `value` (up to `length` digits).
  */
 export function OtpInput({
   value,
@@ -12,7 +12,7 @@ export function OtpInput({
   onComplete,
   disabled,
   error,
-  length = 6,
+  length = 4,
 }: {
   value: string;
   onChange: (v: string) => void;

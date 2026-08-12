@@ -6,7 +6,7 @@ code is done; this is the config work on the dakiya + infra side.
 ## Division of responsibility
 
 - **The app (India Wealth Ranker)** owns the OTP lifecycle: it generates the
-  6-digit code, stores it **hashed** (sha256, phone-bound) in Postgres with a
+  4-digit code, stores it **hashed** (sha256, phone-bound) in Postgres with a
   5-minute expiry, attempt cap, and send rate-limits, and verifies it.
 - **dakiya** is delivery only: it receives the code as a param, renders the
   registered DLT template, and sends via Times (Smartping) using the OTP
@@ -21,7 +21,7 @@ code is done; this is the config work on the dakiya + infra side.
   "channel": "COMMUNICATION_CHANNEL_SMS",
   "type": "OTP",
   "templateId": "<DLT content template id>",
-  "params": { "otp": "123456" },
+  "params": { "otp": "1234" },
   "userDetails": { "mobileNumber": "+919876543210" }
 }
 ```

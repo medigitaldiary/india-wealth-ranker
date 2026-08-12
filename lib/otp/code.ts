@@ -1,8 +1,8 @@
 import { createHash, randomInt, timingSafeEqual } from "crypto";
 
-/** 6-digit numeric OTP, zero-padded. */
+/** 4-digit numeric OTP, zero-padded (matches BondScanner). */
 export function generateCode(): string {
-  return String(randomInt(0, 1_000_000)).padStart(6, "0");
+  return String(randomInt(0, 10_000)).padStart(4, "0");
 }
 
 /** Codes are stored hashed (bound to the phone), never in plaintext. */

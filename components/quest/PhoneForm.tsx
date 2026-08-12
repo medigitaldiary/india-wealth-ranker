@@ -83,7 +83,7 @@ export function PhoneForm() {
   };
 
   const verify = async (fullCode: string) => {
-    if (fullCode.length !== 6 || verifying) return;
+    if (fullCode.length !== 4 || verifying) return;
     setError(null);
     setVerifying(true);
     try {
@@ -162,7 +162,7 @@ export function PhoneForm() {
               onBlur={field.onBlur}
               name={field.name}
               error={!!fieldState.error}
-              hint={fieldState.error?.message ?? "We'll text you a 6-digit code."}
+              hint={fieldState.error?.message ?? "We'll text you a 4-digit code."}
             />
           )}
         />
@@ -219,7 +219,7 @@ export function PhoneForm() {
         variant="primary"
         size="lg"
         onClick={() => verify(code)}
-        disabled={verifying || code.length !== 6}
+        disabled={verifying || code.length !== 4}
       >
         {verifying ? "Verifying…" : "Verify & see my rank"}
       </Button>
