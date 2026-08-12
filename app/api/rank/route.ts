@@ -44,19 +44,19 @@ export async function POST(req: Request) {
     if (leadId) {
       await db
         .update(leads)
-        .set({ netWorthInr: wealth })
+        .set({ totalWealthInr: wealth })
         .where(eq(leads.id, leadId));
     }
 
     const [{ ahead }] = await db
       .select({ ahead: count() })
       .from(leads)
-      .where(gt(leads.netWorthInr, wealth));
+      .where(gt(leads.totalWealthInr, wealth));
 
     const [{ total }] = await db
       .select({ total: count() })
       .from(leads)
-      .where(isNotNull(leads.netWorthInr));
+      .where(isNotNull(leads.totalWealthInr));
 
     return NextResponse.json({
       ok: true,

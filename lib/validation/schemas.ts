@@ -28,6 +28,13 @@ export type NameInput = z.infer<typeof nameSchema>;
 export const phoneSchema = z.object({ phone });
 export type PhoneInput = z.infer<typeof phoneSchema>;
 
+/** OTP verify — phone + 6-digit code. */
+export const otpVerifySchema = z.object({
+  phone,
+  code: z.string().trim().regex(/^\d{6}$/, "Enter the 6-digit code"),
+});
+export type OtpVerifyInput = z.infer<typeof otpVerifySchema>;
+
 /** Full lead payload written to the DB (deduped on phone). */
 export const leadSchema = z.object({ firstName, lastName, phone });
 export type LeadInput = z.infer<typeof leadSchema>;

@@ -5,8 +5,8 @@ import {
   timestamp,
   integer,
   bigint,
-  numeric,
   varchar,
+  boolean,
   index,
 } from "drizzle-orm/pg-core";
 
@@ -14,32 +14,31 @@ export const leads = pgTable(
   "leads",
   {
     id: serial("id").primaryKey(),
-    fullName: text("full_name").notNull(),
-    phone: varchar("phone", { length: 16 }).notNull().unique(), // +91XXXXXXXXXX — unique so a repeat visitor updates one row
-    city: text("city"), // optional; powers "User from <city>" leaderboard handle
+    firstName: text("first_name").notNull(),
+    lastName: text("last_name").notNull(),
+    phone: varchar("phone", { length: 16 }).notNull().unique(), // +91XXXXXXXXXX
+    phoneVerified: boolean("phone_verified").default(false).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-    // Denormalised final rank so we can pull leaderboard fast.
-    netWorthInr: bigint("net_worth_inr", { mode: "number" }),
-    percentile: numeric("percentile", { precision: 5, scale: 2 }),
-    tier: text("tier"), // 'rising-aspirant' | 'comfortable-middle' | 'top-10-percent' | 'elite-1-percent'
+    // Total wealth (assets, no liabilities). Null until the reveal step runs.
+    totalWealthInr: bigint("total_wealth_inr", { mode: "number" }),
   },
+  (t) => [index("leads_wealth_idx").on(t.totalWealthInr)],
 );
 
-export const leaderboardEntries = pgTable(
-  "leaderboard_entries",
+export const otpVerifications = pgTable(
+  "otp_verifications",
   {
     id: serial("id").primaryKey(),
-    leadId: integer("lead_id")
-      .references(() => leads.id, { onDelete: "cascade" })
-      .unique(), // one leaderboard row per lead
-    displayName: text("display_name").notNull(), // anonymised, e.g. "Aspirant #482"
-    tier: text("tier").notNull(),
-    percentile: numeric("percentile", { precision: 5, scale: 2 }).notNull(),
+    phone: varchar("phone", { length: 16 }).notNull(),
+    codeHash: text("code_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    attempts: integer("attempts").default(0).notNull(),
+    consumed: boolean("consumed").default(false).notNull(),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   },
-  (t) => [index("leaderboard_percentile_idx").on(t.percentile)],
+  (t) => [index("otp_phone_idx").on(t.phone)],
 );
 
 export type Lead = typeof leads.$inferSelect;
 export type NewLead = typeof leads.$inferInsert;
-export type LeaderboardEntry = typeof leaderboardEntries.$inferSelect;
+export type OtpVerification = typeof otpVerifications.$inferSelect;

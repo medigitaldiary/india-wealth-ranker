@@ -20,17 +20,21 @@ export async function POST(req: Request) {
   }
 
   const phone = `+91${parsed.data.phone}`;
-  const fullName = `${parsed.data.firstName} ${parsed.data.lastName}`;
+  const { firstName, lastName } = parsed.data;
 
   if (!hasDatabase()) {
     return NextResponse.json({ ok: true, id: null, persisted: false });
   }
 
   try {
+    // Called only after OTP verification, so phone_verified is true.
     const [row] = await getDb()
       .insert(leads)
-      .values({ fullName, phone })
-      .onConflictDoUpdate({ target: leads.phone, set: { fullName } })
+      .values({ firstName, lastName, phone, phoneVerified: true })
+      .onConflictDoUpdate({
+        target: leads.phone,
+        set: { firstName, lastName, phoneVerified: true },
+      })
       .returning({ id: leads.id });
 
     return NextResponse.json({ ok: true, id: row.id, persisted: true });
