@@ -14,7 +14,7 @@ const PREV: Record<string, string> = {
 /**
  * Back control shown on every quest step. Uses the BondScanner ghost Button
  * (low-emphasis) and steps back one level based on the current route. Values
- * are preserved because the quest store persists to localStorage.
+ * are preserved in the in-memory store across in-app navigation.
  */
 export function QuestBack() {
   const pathname = usePathname();

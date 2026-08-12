@@ -1,4 +1,4 @@
-/** Lightweight placeholder shown before the persisted store hydrates. */
+/** Lightweight placeholder shown until the component has mounted on the client. */
 export function FormSkeleton() {
   return (
     <div className="flex flex-col gap-5 animate-pulse" aria-hidden>

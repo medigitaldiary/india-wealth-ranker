@@ -1,10 +1,12 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { SignUpButton } from "@/components/SignUpButton";
+import { ResetQuest } from "@/components/quest/ResetQuest";
 
 export default function LandingPage() {
   return (
     <>
+      <ResetQuest />
       {/* Top bar */}
       <header className="w-full border-b border-border-subtle bg-surface-card">
         <div className="mx-auto max-w-[1216px] px-6 h-16 flex items-center justify-between">

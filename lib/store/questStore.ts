@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
 import type { AmountMap } from "@/lib/wealth/calculate";
 
 export interface QuestState {
@@ -37,19 +36,17 @@ const initial = {
   assets: {} as AmountMap,
 };
 
-export const useQuestStore = create<QuestState>()(
-  persist(
-    (set) => ({
-      ...initial,
-      setName: ({ firstName, lastName }) => set({ firstName, lastName }),
-      setLead: ({ leadId, phone, phoneVerified }) =>
-        set({ leadId, phone, phoneVerified }),
-      reachLevel: (level) =>
-        set((s) => ({ highestLevel: Math.max(s.highestLevel, level) })),
-      setAsset: (key, value) =>
-        set((s) => ({ assets: { ...s.assets, [key]: value } })),
-      reset: () => set({ ...initial, assets: {} }),
-    }),
-    { name: "iwr-quest" },
-  ),
-);
+// In-memory only (no persistence): state survives in-app navigation through the
+// funnel, but a reload or fresh start begins blank — so a new player on the same
+// device never sees the previous person's data.
+export const useQuestStore = create<QuestState>()((set) => ({
+  ...initial,
+  setName: ({ firstName, lastName }) => set({ firstName, lastName }),
+  setLead: ({ leadId, phone, phoneVerified }) =>
+    set({ leadId, phone, phoneVerified }),
+  reachLevel: (level) =>
+    set((s) => ({ highestLevel: Math.max(s.highestLevel, level) })),
+  setAsset: (key, value) =>
+    set((s) => ({ assets: { ...s.assets, [key]: value } })),
+  reset: () => set({ ...initial, assets: {} }),
+}));
