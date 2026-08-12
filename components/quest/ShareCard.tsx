@@ -4,18 +4,12 @@ import { Button } from "@/components/bondscanner/core/Button";
 import { APP_URL, APP_NAME } from "@/lib/config";
 
 /**
- * Social sharing — drives the viral-coefficient metric (PRD §7). WhatsApp is
- * first because it's how India shares. Each button opens a share intent the
- * user completes themselves; nothing posts automatically.
+ * Social sharing — drives the viral-coefficient metric. WhatsApp first, since
+ * that's how India shares. Each button opens a share intent the user completes
+ * themselves; nothing posts automatically.
  */
-export function ShareCard({
-  topPercentLabel,
-  tierName,
-}: {
-  topPercentLabel: string;
-  tierName: string;
-}) {
-  const text = `I'm in the Top ${topPercentLabel} of India's wealth hierarchy (${tierName}). Where do you rank?`;
+export function ShareCard({ rankLabel }: { rankLabel: string }) {
+  const text = `My All India Wealth Rank is ${rankLabel}. Where do you rank?`;
   const shareText = `${text} ${APP_URL}`;
 
   const onWhatsApp = () => {

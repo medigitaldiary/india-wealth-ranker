@@ -1,18 +1,16 @@
 import { NextResponse } from "next/server";
-import { eq } from "drizzle-orm";
+import { eq, gt, count, isNotNull } from "drizzle-orm";
 import { rankSchema } from "@/lib/validation/schemas";
 import { totalWealth } from "@/lib/wealth/calculate";
-import { calculateUserRank } from "@/lib/wealth/ranking";
 import { getDb, hasDatabase } from "@/lib/db/client";
 import { leads } from "@/lib/db/schema";
 
 /**
- * Computes the rank server-side (authoritative) and, when a DB is configured,
- * stores the lead's total wealth. Total wealth is recomputed here from the raw
- * amounts, never trusted from the client.
- *
- * NOTE (Phase 1 interim): still returns the old percentile/tier. Phase 2
- * replaces this with the participant-based All India Rank.
+ * All India Rank. Rank is computed among participants only — everyone who has
+ * completed the journey (i.e. has a stored total wealth). We store this lead's
+ * total wealth, then:
+ *   AIR = 1 + (number of participants with MORE wealth than you).
+ * Total wealth is recomputed server-side; never trusted from the client.
  */
 export async function POST(req: Request) {
   const json = await req.json().catch(() => null);
@@ -26,36 +24,55 @@ export async function POST(req: Request) {
   }
 
   const { assets, leadId } = parsed.data;
-  const wealth = totalWealth(assets);
-  const rank = calculateUserRank(wealth);
+  const wealth = Math.round(totalWealth(assets));
 
-  const result = {
-    ok: true as const,
-    totalWealth: wealth,
-    percentile: rank.percentile,
-    topPercent: rank.topPercent,
-    tier: rank.status_tier,
-    persisted: false,
-  };
-
+  // Without a DB there is no participant pool to rank against.
   if (!hasDatabase()) {
-    return NextResponse.json(result);
+    return NextResponse.json({
+      ok: true,
+      air: null,
+      totalParticipants: null,
+      totalWealth: wealth,
+      persisted: false,
+    });
   }
 
   try {
+    const db = getDb();
+
+    // Record this participant's wealth so they count in the pool.
     if (leadId) {
-      await getDb()
+      await db
         .update(leads)
-        .set({
-          netWorthInr: Math.round(wealth),
-          percentile: rank.percentile.toFixed(2),
-          tier: rank.status_tier,
-        })
+        .set({ netWorthInr: wealth })
         .where(eq(leads.id, leadId));
     }
-    return NextResponse.json({ ...result, persisted: true });
+
+    const [{ ahead }] = await db
+      .select({ ahead: count() })
+      .from(leads)
+      .where(gt(leads.netWorthInr, wealth));
+
+    const [{ total }] = await db
+      .select({ total: count() })
+      .from(leads)
+      .where(isNotNull(leads.netWorthInr));
+
+    return NextResponse.json({
+      ok: true,
+      air: ahead + 1,
+      totalParticipants: total,
+      totalWealth: wealth,
+      persisted: true,
+    });
   } catch (err) {
-    console.error("[api/rank] persist failed:", err);
-    return NextResponse.json(result);
+    console.error("[api/rank] AIR compute failed:", err);
+    return NextResponse.json({
+      ok: true,
+      air: null,
+      totalParticipants: null,
+      totalWealth: wealth,
+      persisted: false,
+    });
   }
 }

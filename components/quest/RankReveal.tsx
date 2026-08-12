@@ -5,19 +5,20 @@ import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
 import CountUp from "react-countup";
 import { LogoMark } from "@/components/bondscanner/brand/Logo";
-import { TierBadge } from "./TierBadge";
 import { ShareCard } from "./ShareCard";
 import { useQuestStore } from "@/lib/store/questStore";
 import { useHydrated } from "@/lib/hooks/useHydrated";
 import { totalWealth } from "@/lib/wealth/calculate";
-import { buildComparison, formatTopPercent } from "@/lib/wealth/ranking";
-import { formatInr } from "@/lib/utils";
 import { BONDSCANNER_URL } from "@/lib/config";
 
 const inr = new Intl.NumberFormat("en-IN", { maximumFractionDigits: 0 });
 
-// NOTE (Phase 1 interim): the hero still shows the old "Top X%" percentile.
-// Phase 2 swaps this for the participant-based All India Rank number.
+interface RankResult {
+  air: number | null;
+  totalParticipants: number | null;
+  totalWealth: number;
+}
+
 export function RankReveal() {
   const router = useRouter();
   const hydrated = useHydrated();
@@ -27,41 +28,42 @@ export function RankReveal() {
   const leadId = useQuestStore((s) => s.leadId);
   const reachLevel = useQuestStore((s) => s.reachLevel);
 
-  const [phase, setPhase] = useState<"calculating" | "revealed">("calculating");
+  const [result, setResult] = useState<RankResult | null>(null);
+  const [errored, setErrored] = useState(false);
   const posted = useRef(false);
 
   const wealth = totalWealth(assets);
-  const comparison = buildComparison(wealth);
-  const tier = comparison.tier;
 
-  // Funnel guard: name entered and phone verified.
+  // Funnel guard.
   useEffect(() => {
     if (hydrated && (!firstName || !phoneVerified)) router.replace("/rank");
   }, [hydrated, firstName, phoneVerified, router]);
 
-  // Reveal sequence + persist (once).
+  // Compute the rank (once), against the live participant pool.
   useEffect(() => {
-    if (!hydrated || !firstName || !phoneVerified) return;
-    const t = setTimeout(() => setPhase("revealed"), 1100);
-
-    if (!posted.current) {
-      posted.current = true;
-      reachLevel(3);
-      fetch("/api/rank", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assets, leadId }),
-      }).catch(() => {
-        /* persistence is best-effort; the reveal is client-computed */
-      });
-    }
-    return () => clearTimeout(t);
+    if (!hydrated || !firstName || !phoneVerified || posted.current) return;
+    posted.current = true;
+    reachLevel(3);
+    fetch("/api/rank", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ assets, leadId }),
+    })
+      .then((r) => r.json())
+      .then((d) =>
+        setResult({
+          air: d.air ?? null,
+          totalParticipants: d.totalParticipants ?? null,
+          totalWealth: typeof d.totalWealth === "number" ? d.totalWealth : wealth,
+        }),
+      )
+      .catch(() => setErrored(true));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [hydrated, firstName, phoneVerified]);
 
   if (!hydrated || !firstName || !phoneVerified) return null;
 
-  if (phase === "calculating") {
+  if (!result && !errored) {
     return (
       <div className="flex flex-col items-center justify-center gap-5 py-20 text-center">
         <motion.span
@@ -73,14 +75,17 @@ export function RankReveal() {
           <i className="ri-compass-3-line text-4xl" aria-hidden />
         </motion.span>
         <p className="text-text-body" style={{ fontSize: "var(--body-lg-size)" }}>
-          Ranking you against India&apos;s wealth distribution…
+          Ranking you against everyone who&apos;s played…
         </p>
       </div>
     );
   }
 
-  const topLabel = formatTopPercent(comparison.topPercent);
-  const isElite = tier.id === "elite-1-percent";
+  const shownWealth = result?.totalWealth ?? wealth;
+  const air = result?.air ?? null;
+  const total = result?.totalParticipants ?? null;
+  const ahead = air !== null && total !== null ? Math.max(0, total - air) : null;
+  const rankLabel = air !== null ? `#${inr.format(air)}` : "—";
 
   return (
     <motion.div
@@ -89,10 +94,10 @@ export function RankReveal() {
       animate="show"
       variants={{ show: { transition: { staggerChildren: 0.12 } } }}
     >
-      {/* Hero */}
+      {/* Hero — the AIR number */}
       <motion.div
         variants={fadeUp}
-        className="rounded-[var(--r-20)] border border-border-subtle bg-surface-card p-7 sm:p-9 text-center flex flex-col items-center gap-4"
+        className="rounded-[var(--r-20)] border border-border-subtle bg-surface-card p-7 sm:p-9 text-center flex flex-col items-center gap-3"
         style={{ boxShadow: "var(--shadow-md)" }}
       >
         <span
@@ -104,39 +109,37 @@ export function RankReveal() {
             fontWeight: "var(--weight-medium)",
           }}
         >
-          {firstName}, you rank in the
+          {firstName}, your All India Rank is
         </span>
         <div
           className="num text-brand"
           style={{
-            fontSize: "clamp(2.75rem, 12vw, var(--display-xl-size))",
+            fontSize: "clamp(2.75rem, 13vw, var(--display-xl-size))",
             lineHeight: 1,
             fontWeight: "var(--weight-semibold)",
             letterSpacing: "var(--display-xl-tracking)",
           }}
         >
-          Top{" "}
-          <CountUp
-            end={comparison.topPercent}
-            decimals={comparison.topPercent < 10 ? 1 : 0}
-            duration={1.4}
-            suffix="%"
-          />
+          {air !== null ? (
+            <>
+              #
+              <CountUp end={air} duration={1.4} separator="," />
+            </>
+          ) : (
+            rankLabel
+          )}
         </div>
         <span className="text-text-body" style={{ fontSize: "var(--body-md-size)" }}>
-          of India&apos;s wealth hierarchy
+          by total wealth in India
         </span>
-        <div className="pt-1">
-          <TierBadge tier={tier} />
-        </div>
       </motion.div>
 
       {/* Total wealth */}
       <motion.div variants={fadeUp}>
-        <StatRow label="Your total wealth" value={`₹${inr.format(Math.round(wealth))}`} />
+        <StatRow label="Your total wealth" value={`₹${inr.format(Math.round(shownWealth))}`} />
       </motion.div>
 
-      {/* Comparison */}
+      {/* How you stack up — total participants lives here, not next to the rank */}
       <motion.div
         variants={fadeUp}
         className="rounded-[var(--r-16)] border border-border-subtle bg-surface-card p-6 flex flex-col gap-4"
@@ -146,42 +149,34 @@ export function RankReveal() {
           className="text-text-title"
           style={{ fontSize: "var(--h5-size)", fontWeight: "var(--weight-semibold)" }}
         >
-          How you compare
+          How you stack up
         </h2>
-        <CompareLine
-          icon="ri-group-line"
-          label="Ahead of"
-          value={`${Math.round(comparison.percentile)}% of Indians`}
-        />
-        <CompareLine
-          icon="ri-scales-2-line"
-          label="Worth"
-          value={`${comparison.vsMedian >= 1 ? comparison.vsMedian.toFixed(1) : comparison.vsMedian.toFixed(2)}× the median adult`}
-        />
-        {isElite ? (
+        {ahead !== null && (
           <CompareLine
-            icon="ri-vip-crown-line"
-            label="Status"
-            value="You've reached the top 1%."
-            highlight
+            icon="ri-group-line"
+            label="Ahead of"
+            value={`${inr.format(ahead)} ${ahead === 1 ? "player" : "players"}`}
           />
-        ) : (
+        )}
+        {total !== null && (
           <CompareLine
-            icon="ri-arrow-up-line"
-            label="To Elite 1%"
-            value={`${formatInr(comparison.toTop1)} to go`}
+            icon="ri-flag-line"
+            label="Players so far"
+            value={inr.format(total)}
           />
         )}
         <p className="text-text-muted" style={{ fontSize: "var(--body-xs-size)" }}>
-          Estimates based on India&apos;s wealth distribution. For guidance, not
-          financial advice.
+          Your rank is live and climbs or slips as more people play. For
+          guidance, not financial advice.
         </p>
       </motion.div>
 
       {/* Share */}
-      <motion.div variants={fadeUp}>
-        <ShareCard topPercentLabel={topLabel} tierName={tier.name} />
-      </motion.div>
+      {air !== null && (
+        <motion.div variants={fadeUp}>
+          <ShareCard rankLabel={rankLabel} />
+        </motion.div>
+      )}
 
       {/* Bonds CTA */}
       <motion.a
@@ -258,24 +253,10 @@ function StatRow({ label, value }: { label: string; value: string }) {
   );
 }
 
-function CompareLine({
-  icon,
-  label,
-  value,
-  highlight,
-}: {
-  icon: string;
-  label: string;
-  value: string;
-  highlight?: boolean;
-}) {
+function CompareLine({ icon, label, value }: { icon: string; label: string; value: string }) {
   return (
     <div className="flex items-center gap-3">
-      <i
-        className={`${icon} text-lg`}
-        style={{ color: highlight ? "var(--brand-accent)" : "var(--text-muted)" }}
-        aria-hidden
-      />
+      <i className={`${icon} text-lg text-text-muted`} aria-hidden />
       <span className="text-text-muted" style={{ fontSize: "var(--body-sm-size)" }}>
         {label}
       </span>
