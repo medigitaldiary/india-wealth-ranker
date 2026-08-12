@@ -3,8 +3,8 @@
 import { usePathname } from "next/navigation";
 
 const STEPS = [
-  { match: "/rank", label: "You" },
-  { match: "/rank/portfolio", label: "Wealth" },
+  { match: "/rank", label: "Wealth" },
+  { match: "/rank/details", label: "You" },
   { match: "/rank/verify", label: "Verify" },
   { match: "/rank/reveal", label: "Rank" },
 ];

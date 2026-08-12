@@ -6,8 +6,8 @@ import { Button } from "@/components/bondscanner/core/Button";
 // Where "Back" goes from each step of the journey.
 const PREV: Record<string, string> = {
   "/rank": "/",
-  "/rank/portfolio": "/rank",
-  "/rank/verify": "/rank/portfolio",
+  "/rank/details": "/rank",
+  "/rank/verify": "/rank/details",
   "/rank/reveal": "/rank/verify",
 };
 

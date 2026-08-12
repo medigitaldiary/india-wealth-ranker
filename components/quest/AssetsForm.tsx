@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/bondscanner/core/Button";
 import { AmountGroups } from "./AmountGroups";
@@ -13,22 +12,16 @@ import { useHydrated } from "@/lib/hooks/useHydrated";
 export function AssetsForm() {
   const router = useRouter();
   const hydrated = useHydrated();
-  const firstName = useQuestStore((s) => s.firstName);
   const assets = useQuestStore((s) => s.assets);
   const reachLevel = useQuestStore((s) => s.reachLevel);
-
-  // Funnel guard: must have entered a name first.
-  useEffect(() => {
-    if (hydrated && !firstName) router.replace("/rank");
-  }, [hydrated, firstName, router]);
 
   if (!hydrated) return <FormSkeleton />;
 
   const total = totalWealth(assets);
 
   const onContinue = () => {
-    reachLevel(2);
-    router.push("/rank/verify");
+    reachLevel(1);
+    router.push("/rank/details");
   };
 
   return (

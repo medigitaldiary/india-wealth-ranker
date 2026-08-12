@@ -1,6 +1,6 @@
-import { NameForm } from "@/components/quest/NameForm";
+import { AssetsForm } from "@/components/quest/AssetsForm";
 
-export default function NamePage() {
+export default function AssetsPage() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
@@ -13,8 +13,8 @@ export default function NamePage() {
             fontWeight: "var(--weight-medium)",
           }}
         >
-          <i className="ri-user-line text-base" aria-hidden />
-          Step 1 · You
+          <i className="ri-wallet-3-line text-base" aria-hidden />
+          Step 1 · Your wealth
         </span>
         <h1
           className="text-text-title"
@@ -25,22 +25,18 @@ export default function NamePage() {
             fontWeight: "var(--weight-semibold)",
           }}
         >
-          What&apos;s your name?
+          What you own
         </h1>
         <p
           className="text-text-body"
           style={{ fontSize: "var(--body-md-size)", lineHeight: "var(--body-md-line)" }}
         >
-          We&apos;ll use it to personalise your All India Rank.
+          Add up your assets and watch your total wealth climb. None of it is
+          shared publicly.
         </p>
       </header>
 
-      <div
-        className="rounded-[var(--r-16)] border border-border-subtle bg-surface-card p-6 sm:p-7"
-        style={{ boxShadow: "var(--shadow-xs)" }}
-      >
-        <NameForm />
-      </div>
+      <AssetsForm />
     </div>
   );
 }

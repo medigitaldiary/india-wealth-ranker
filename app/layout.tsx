@@ -24,8 +24,8 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "India Wealth Ranker: find your All India Wealth Rank",
-    template: "%s | India Wealth Ranker",
+    default: "Wealth AIR: find your All India Wealth Rank",
+    template: "%s | Wealth AIR",
   },
   description:
     "Add up what you own and find your All India Wealth Rank — exactly where you stand among everyone who's played. Free and takes a minute. By BondScanner.",

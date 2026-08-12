@@ -30,7 +30,7 @@ export default function LandingPage() {
             }}
           >
             <i className="ri-compass-3-line text-base" aria-hidden />
-            Find your AIR · A BondScanner tool
+            Wealth AIR · by BondScanner
           </span>
 
           {/* Headline */}

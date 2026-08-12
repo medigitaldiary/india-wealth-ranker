@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -7,11 +8,19 @@ import { Input } from "@/components/bondscanner/forms/Input";
 import { Button } from "@/components/bondscanner/core/Button";
 import { nameSchema, type NameInput } from "@/lib/validation/schemas";
 import { useQuestStore } from "@/lib/store/questStore";
+import { useHydrated } from "@/lib/hooks/useHydrated";
 
 export function NameForm() {
   const router = useRouter();
+  const hydrated = useHydrated();
+  const highestLevel = useQuestStore((s) => s.highestLevel);
   const setName = useQuestStore((s) => s.setName);
   const reachLevel = useQuestStore((s) => s.reachLevel);
+
+  // Funnel guard: must have entered wealth (step 1) first.
+  useEffect(() => {
+    if (hydrated && highestLevel < 1) router.replace("/rank");
+  }, [hydrated, highestLevel, router]);
 
   const { control, handleSubmit } = useForm<NameInput>({
     resolver: zodResolver(nameSchema),
@@ -19,10 +28,12 @@ export function NameForm() {
     defaultValues: { firstName: "", lastName: "" },
   });
 
+  if (!hydrated) return null;
+
   const onSubmit = (data: NameInput) => {
     setName({ firstName: data.firstName.trim(), lastName: data.lastName.trim() });
-    reachLevel(1);
-    router.push("/rank/portfolio");
+    reachLevel(2);
+    router.push("/rank/verify");
   };
 
   return (

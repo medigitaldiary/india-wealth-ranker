@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, type Variants } from "framer-motion";
 import CountUp from "react-countup";
 import { LogoMark } from "@/components/bondscanner/brand/Logo";
+import { BrandLogo } from "@/components/brand/BrandLogo";
 import { ShareCard } from "./ShareCard";
 import { useQuestStore } from "@/lib/store/questStore";
 import { useHydrated } from "@/lib/hooks/useHydrated";
@@ -166,8 +167,7 @@ export function RankReveal() {
           />
         )}
         <p className="text-text-muted" style={{ fontSize: "var(--body-xs-size)" }}>
-          Your rank is live and climbs or slips as more people play. For
-          guidance, not financial advice.
+          Your rank is live and climbs or slips as more people play.
         </p>
       </motion.div>
 
@@ -209,6 +209,38 @@ export function RankReveal() {
           aria-hidden
         />
       </motion.a>
+
+      {/* Powered by + disclaimer */}
+      <motion.footer variants={fadeUp} className="flex flex-col items-center gap-3 pt-2 pb-2 text-center">
+        <span
+          className="inline-flex items-center gap-1.5 text-text-muted"
+          style={{
+            fontSize: "var(--overline-size)",
+            letterSpacing: "var(--overline-tracking)",
+            textTransform: "uppercase",
+            fontWeight: "var(--weight-medium)",
+          }}
+        >
+          Powered by
+          <BrandLogo size={18} />
+        </span>
+        <p
+          className="text-text-muted max-w-lg"
+          style={{ fontSize: "var(--body-xs-size)", lineHeight: "var(--body-xs-line)" }}
+        >
+          Wealth AIR is an informational tool by BondScanner. Your rank is an
+          estimate based only on the amounts you enter and how they compare with
+          others who have taken the test, so it is not a verified measure of your
+          standing among all Indians and can change as more people play. Nothing
+          here is investment, financial, tax, or legal advice, or an offer or
+          recommendation to buy or sell any security. The amounts you enter are
+          used only to calculate your rank and are never shown publicly.
+          BondScanner makes no warranty as to accuracy and accepts no liability
+          for any decision taken based on this tool. Investments in bonds and
+          securities carry market risk; read all scheme and offer documents
+          carefully before investing.
+        </p>
+      </motion.footer>
     </motion.div>
   );
 }
