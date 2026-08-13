@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { SignUpButton } from "@/components/SignUpButton";
-import { QuestProgress } from "@/components/quest/QuestProgress";
 import { QuestBack } from "@/components/quest/QuestBack";
 
 export default function QuestLayout({ children }: LayoutProps<"/rank">) {
@@ -12,10 +11,7 @@ export default function QuestLayout({ children }: LayoutProps<"/rank">) {
           <Link href="/" aria-label="BondScanner home">
             <BrandLogo size={30} />
           </Link>
-          <div className="flex items-center gap-3">
-            <QuestProgress />
-            <SignUpButton />
-          </div>
+          <SignUpButton />
         </div>
       </header>
       <div className="flex-1 flex flex-col items-center px-4 sm:px-6 py-8 sm:py-12">

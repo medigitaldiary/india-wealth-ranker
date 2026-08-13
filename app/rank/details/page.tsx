@@ -1,21 +1,9 @@
-import { NameForm } from "@/components/quest/NameForm";
+import { DetailsForm } from "@/components/quest/DetailsForm";
 
 export default function DetailsPage() {
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-2">
-        <span
-          className="inline-flex items-center gap-2 text-brand-accent"
-          style={{
-            fontSize: "var(--overline-size)",
-            letterSpacing: "var(--overline-tracking)",
-            textTransform: "uppercase",
-            fontWeight: "var(--weight-medium)",
-          }}
-        >
-          <i className="ri-user-line text-base" aria-hidden />
-          Step 2 · You
-        </span>
         <h1
           className="text-text-title"
           style={{
@@ -25,13 +13,13 @@ export default function DetailsPage() {
             fontWeight: "var(--weight-semibold)",
           }}
         >
-          What&apos;s your name?
+          Almost there
         </h1>
         <p
           className="text-text-body"
           style={{ fontSize: "var(--body-md-size)", lineHeight: "var(--body-md-line)" }}
         >
-          We&apos;ll use it to personalise your All India Rank.
+          Add your details and verify your number to unlock your All-India Rank.
         </p>
       </header>
 
@@ -39,7 +27,7 @@ export default function DetailsPage() {
         className="rounded-[var(--r-16)] border border-border-subtle bg-surface-card p-6 sm:p-7"
         style={{ boxShadow: "var(--shadow-xs)" }}
       >
-        <NameForm />
+        <DetailsForm />
       </div>
     </div>
   );
