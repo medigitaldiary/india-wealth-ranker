@@ -4,6 +4,16 @@ import { rankSchema } from "@/lib/validation/schemas";
 import { totalWealth } from "@/lib/wealth/calculate";
 import { getDb, hasDatabase } from "@/lib/db/client";
 import { leads } from "@/lib/db/schema";
+import { withCors, corsPreflight } from "@/lib/http/cors";
+
+// Called cross-origin from bondscanner.com/wealth-air (hybrid setup).
+export function OPTIONS(req: Request) {
+  return corsPreflight(req);
+}
+
+export async function POST(req: Request) {
+  return withCors(req, await handlePost(req));
+}
 
 /**
  * All India Rank. Rank is computed among participants only — everyone who has
@@ -12,7 +22,7 @@ import { leads } from "@/lib/db/schema";
  *   AIR = 1 + (number of participants with MORE wealth than you).
  * Total wealth is recomputed server-side; never trusted from the client.
  */
-export async function POST(req: Request) {
+async function handlePost(req: Request) {
   const json = await req.json().catch(() => null);
   const parsed = rankSchema.safeParse(json);
 
