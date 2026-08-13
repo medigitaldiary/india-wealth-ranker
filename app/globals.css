@@ -107,3 +107,18 @@ body {
   overflow-x: hidden;
   max-width: 100vw;
 }
+
+/* ── Mobile keyboard smoothness ───────────────────────────────────
+   iOS Safari auto-zooms the whole page when it focuses an input whose
+   font-size is under 16px — which makes the keyboard open with a jarring
+   zoom-in/pinch-back-out. The DS input is 14px, so on touch devices (and
+   any narrow viewport) bump the field text to 16px to suppress that zoom.
+   Desktop keeps the tighter 14px DS size. */
+@media (pointer: coarse), (max-width: 640px) {
+  /* Higher specificity than the DS's runtime-injected `.bs-input input`
+     rule so this wins regardless of stylesheet insertion order. */
+  .bs-field .bs-input input {
+    font-size: 16px;
+    line-height: 22px;
+  }
+}
