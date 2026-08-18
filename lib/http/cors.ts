@@ -26,6 +26,8 @@ function allowedList(): string[] {
 function resolveOrigin(origin: string | null): string | null {
   if (!origin) return null;
   if (allowedList().includes(origin)) return origin;
+  // Any bondscanner.com subdomain (preview, staging, www, …) where /wealth-air lives.
+  if (/^https:\/\/([a-z0-9-]+\.)*bondscanner\.com$/.test(origin)) return origin;
   // Vercel preview deployments (bond-scanner previews) — low-sensitivity endpoints.
   if (/^https:\/\/[a-z0-9-]+\.vercel\.app$/.test(origin)) return origin;
   return null;
