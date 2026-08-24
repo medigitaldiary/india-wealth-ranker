@@ -30,7 +30,7 @@ export default function LandingPage() {
             }}
           >
             <i className="ri-compass-3-line text-base" aria-hidden />
-            Wealth AIR · by BondScanner
+            Wealth AIR
           </span>
 
           {/* Headline */}
@@ -43,7 +43,7 @@ export default function LandingPage() {
               letterSpacing: "var(--display-lg-tracking)",
             }}
           >
-            What&apos;s your All India Wealth Rank?
+            What&apos;s your All-India Rank?
           </h1>
 
           {/* Subhead */}
@@ -54,8 +54,8 @@ export default function LandingPage() {
               lineHeight: "var(--body-lg-line)",
             }}
           >
-            Add up what you own, and in under a minute find out exactly where
-            you rank among everyone who&apos;s played.
+            See where you rank among India&apos;s richest, based on community
+            data.
           </p>
 
           {/* CTA */}

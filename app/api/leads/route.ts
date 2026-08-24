@@ -2,13 +2,23 @@ import { NextResponse } from "next/server";
 import { leadSchema } from "@/lib/validation/schemas";
 import { getDb, hasDatabase } from "@/lib/db/client";
 import { leads } from "@/lib/db/schema";
+import { withCors, corsPreflight } from "@/lib/http/cors";
+
+// Called cross-origin from bondscanner.com/wealth-air (hybrid setup).
+export function OPTIONS(req: Request) {
+  return corsPreflight(req);
+}
+
+export async function POST(req: Request) {
+  return withCors(req, await handlePost(req));
+}
 
 /**
  * Lead capture (phone step). Validates server-side, then upserts on phone so a
  * repeat visitor updates their existing row. When DATABASE_URL is absent it
  * accepts the lead without persisting so the flow still advances.
  */
-export async function POST(req: Request) {
+async function handlePost(req: Request) {
   const json = await req.json().catch(() => null);
   const parsed = leadSchema.safeParse(json);
 

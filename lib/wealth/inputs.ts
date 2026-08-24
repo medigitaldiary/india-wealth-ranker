@@ -32,7 +32,7 @@ export const ASSET_GROUPS: GroupDef[] = [
       {
         key: "others",
         label: "Others",
-        hint: "Anything else you hold (optional)",
+        hint: "Anything else you hold",
         icon: "ri-more-2-line",
       },
     ],

@@ -8,7 +8,7 @@ export default function robots(): MetadataRoute.Robots {
       userAgent: "*",
       allow: "/",
       // Funnel steps hold no indexable content on their own.
-      disallow: ["/rank/portfolio", "/rank/verify", "/rank/reveal"],
+      disallow: ["/rank/details", "/rank/reveal"],
     },
     sitemap: `${base}/sitemap.xml`,
   };

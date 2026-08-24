@@ -7,21 +7,25 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/bondscanner/forms/Input";
 import { Button } from "@/components/bondscanner/core/Button";
 import { OtpInput } from "./OtpInput";
-import { phoneSchema, type PhoneInput } from "@/lib/validation/schemas";
+import { leadSchema, type LeadInput } from "@/lib/validation/schemas";
 import { useQuestStore } from "@/lib/store/questStore";
 import { useHydrated } from "@/lib/hooks/useHydrated";
 
-export function PhoneForm() {
+/**
+ * Combined "you" step: first name, last name and mobile number on one screen.
+ * Submitting sends the OTP and swaps the fields for the code entry, so name +
+ * phone + verification all happen here before the rank is revealed.
+ */
+export function DetailsForm() {
   const router = useRouter();
   const hydrated = useHydrated();
-  const firstName = useQuestStore((s) => s.firstName);
-  const lastName = useQuestStore((s) => s.lastName);
   const highestLevel = useQuestStore((s) => s.highestLevel);
+  const setName = useQuestStore((s) => s.setName);
   const setLead = useQuestStore((s) => s.setLead);
   const reachLevel = useQuestStore((s) => s.reachLevel);
 
-  const [stage, setStage] = useState<"phone" | "code">("phone");
-  const [phone, setPhone] = useState("");
+  const [stage, setStage] = useState<"form" | "code">("form");
+  const [details, setDetails] = useState<LeadInput | null>(null);
   const [code, setCode] = useState("");
   const [sending, setSending] = useState(false);
   const [verifying, setVerifying] = useState(false);
@@ -29,10 +33,10 @@ export function PhoneForm() {
   const [devCode, setDevCode] = useState<string | null>(null);
   const [resendIn, setResendIn] = useState(0);
 
-  // Funnel guard.
+  // Funnel guard: must have entered wealth (step 1) first.
   useEffect(() => {
-    if (hydrated && (!firstName || highestLevel < 2)) router.replace("/rank");
-  }, [hydrated, firstName, highestLevel, router]);
+    if (hydrated && highestLevel < 1) router.replace("/rank");
+  }, [hydrated, highestLevel, router]);
 
   // Resend cooldown countdown.
   useEffect(() => {
@@ -41,10 +45,10 @@ export function PhoneForm() {
     return () => clearInterval(t);
   }, [resendIn]);
 
-  const { control, handleSubmit } = useForm<PhoneInput>({
-    resolver: zodResolver(phoneSchema),
+  const { control, handleSubmit } = useForm<LeadInput>({
+    resolver: zodResolver(leadSchema),
     mode: "onTouched",
-    defaultValues: { phone: "" },
+    defaultValues: { firstName: "", lastName: "", phone: "" },
   });
 
   if (!hydrated) return null;
@@ -70,7 +74,6 @@ export function PhoneForm() {
         setSending(false);
         return;
       }
-      setPhone(num);
       setDevCode(json.devCode ?? null);
       setResendIn(json.cooldownSec ?? 30);
       setCode("");
@@ -82,15 +85,27 @@ export function PhoneForm() {
     }
   };
 
+  const onSubmit = (data: LeadInput) => {
+    const clean: LeadInput = {
+      firstName: data.firstName.trim(),
+      lastName: data.lastName.trim(),
+      phone: data.phone,
+    };
+    setDetails(clean);
+    setName({ firstName: clean.firstName, lastName: clean.lastName });
+    reachLevel(2);
+    sendOtp(clean.phone);
+  };
+
   const verify = async (fullCode: string) => {
-    if (fullCode.length !== 4 || verifying) return;
+    if (fullCode.length !== 4 || verifying || !details) return;
     setError(null);
     setVerifying(true);
     try {
       const res = await fetch("/api/otp/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ phone, code: fullCode }),
+        body: JSON.stringify({ phone: details.phone, code: fullCode }),
       });
       const json = await res.json().catch(() => ({}));
       if (!json.verified) {
@@ -109,10 +124,14 @@ export function PhoneForm() {
       const leadRes = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ firstName, lastName, phone }),
+        body: JSON.stringify(details),
       });
       const leadJson = leadRes.ok ? await leadRes.json() : { id: null };
-      setLead({ leadId: leadJson.id ?? null, phone: `+91${phone}`, phoneVerified: true });
+      setLead({
+        leadId: leadJson.id ?? null,
+        phone: `+91${details.phone}`,
+        phoneVerified: true,
+      });
       reachLevel(3);
       router.push("/rank/reveal");
     } catch {
@@ -137,9 +156,52 @@ export function PhoneForm() {
     </div>
   );
 
-  if (stage === "phone") {
+  if (stage === "form") {
     return (
-      <form onSubmit={handleSubmit((d) => sendOtp(d.phone))} noValidate className="flex flex-col gap-5">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-5">
+        <div className="grid gap-5 sm:grid-cols-2">
+          <Controller
+            control={control}
+            name="firstName"
+            render={({ field, fieldState }) => (
+              <Input
+                label="First name"
+                required
+                size="lg"
+                placeholder="Aarav"
+                leadingIcon={<i className="ri-user-line" aria-hidden />}
+                autoComplete="given-name"
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
+                error={!!fieldState.error}
+                hint={fieldState.error?.message}
+              />
+            )}
+          />
+          <Controller
+            control={control}
+            name="lastName"
+            render={({ field, fieldState }) => (
+              <Input
+                label="Last name"
+                required
+                size="lg"
+                placeholder="Sharma"
+                leadingIcon={<i className="ri-user-line" aria-hidden />}
+                autoComplete="family-name"
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                name={field.name}
+                error={!!fieldState.error}
+                hint={fieldState.error?.message}
+              />
+            )}
+          />
+        </div>
+
         <Controller
           control={control}
           name="phone"
@@ -166,7 +228,9 @@ export function PhoneForm() {
             />
           )}
         />
+
         {errorBox}
+
         <Button
           type="submit"
           variant="primary"
@@ -192,7 +256,7 @@ export function PhoneForm() {
       <p className="text-center text-text-body" style={{ fontSize: "var(--body-sm-size)" }}>
         Enter the code sent to{" "}
         <span className="num text-text-title" style={{ fontWeight: 600 }}>
-          +91 {phone}
+          +91 {details?.phone}
         </span>
       </p>
 
@@ -227,16 +291,19 @@ export function PhoneForm() {
       <div className="flex items-center justify-center gap-4 text-center">
         <button
           type="button"
-          onClick={() => setStage("phone")}
+          onClick={() => {
+            setError(null);
+            setStage("form");
+          }}
           className="text-text-muted hover:text-text-title transition-colors"
           style={{ fontSize: "var(--body-sm-size)" }}
         >
-          Change number
+          Edit details
         </button>
         <span className="text-border-default">·</span>
         <button
           type="button"
-          onClick={() => sendOtp(phone)}
+          onClick={() => details && sendOtp(details.phone)}
           disabled={resendIn > 0 || sending}
           className="text-brand-accent hover:text-brand-hover transition-colors disabled:text-text-muted disabled:cursor-not-allowed"
           style={{ fontSize: "var(--body-sm-size)" }}
